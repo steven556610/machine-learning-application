@@ -1,0 +1,78 @@
+experiment QA:
+https://medium.com/data-science-navigator/pca-%E9%99%8D%E7%B6%AD-85f0e34c6b
+https://leemeng.tw/essence-of-principal-component-analysis.html
+https://www.youtube.com/watch?v=PSOt7u8u23w&feature=youtu.be
+https://hackmd.io/@joanne8826/HkTmgThKd
+https://cloud.tencent.com/developer/article/1111769
+
+pca 的使用時機，本身是一個非監督式的線性降維方法。 (程式碼的預設上，會直接降到feature的大小維度。)
+方法：
+    對共變異數矩陣進行特徵分解，以得出數據的主成分（即特徵向量）與它們的權值（即特徵值）
+    在原數據中除掉最小的特徵值所對應的成分，使得降維失去最少的訊息
+降為的主要目堤都是為了加速模型的運算效率還有避免overfitting。
+什麼時候要用降為呢？ 當數據的維度（特徵）很高的時候。 -> 所以我目前的這一個資料集是不是不適合用pca 來降維
+當數據的維度（特徵）具有多重共線性時。
+可以用於影像降噪 (denoiseing) 和影像壓縮(compression)
+
+PCA 本身就是轉軸和投影，至於要降到幾維(k)呢？
+以程式碼目前有的方法有兩種，看pca.explained_variance_ratio_ 和使用模型來找。
+使用解釋性的比例來找結果，通常是看自己設定要多少比例，像是95%, 99% etc.
+雖然這一個資料集應該要用分類模型，但分析過程有用過迴歸模型，所以就有跑過linear regression，去比較不同的k得到 RMSE。
+一樣可以在圖片看到一個拐點。以回歸模型結果來說，最佳的k 為７。
+
+使用機器學習的模型來進行分類
+
+降為的選擇，資料集的狀況，在實際的程式碼當中：遇到的狀況。使用了哪些模型。使用了哪些程式碼。儲存了哪些結果。
+
+目前使用了 logistic regression, svm （有兩種版本），random forest, naive bayes, xgboost
+logistic regression 大概20分鐘就可以運行完畢
+svm 運行10個小時都不行， 難道是cv 設定太大？
+在svm 使用 svc 是implement based on libsvm 。在官方文件上說明，如果是比較大的資料集，可以優先考慮linerSVC 和 SGDClassifier
+xgboost 遇到 32位元的python 跑在64位元os的問題
+random forest 也會跑很久。因此要限定樹的數量和深度，以及會展出去的數量。
+naive bayes 沒有遇到什麼問題，沒有什麼參數可以設定。
+
+https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
+https://www.geeksforgeeks.org/machine-learning/implementing-svm-and-kernel-svm-with-pythons-scikit-learn/
+SVC 在大型資料集上運行緩慢的原因
+Support Vector Machine (SVM)，特別是使用 RBF 核心 (kernel) 時，在訓練過程中其時間複雜度與樣本數量 N 的關係大約是 O(N 3
+ ) 或 O(N 2)，具體取決於實現細節。這意味著當你的資料集樣本數量 N 變大時，訓練時間會急劇增長。
+
+主要有以下幾個原因：
+
+核矩陣的計算： RBF 核心需要計算所有樣本對之間距離的核矩陣（Gram matrix）。這個矩陣的大小是 N×N，計算量為 O(N 
+2
+ )。
+
+尋找支援向量： SVM 的核心目標是找到一個最佳的超平面來區分資料點，這個過程涉及到求解一個二次規劃 (Quadratic Programming, QP) 問題。這個問題的複雜度也與樣本數量相關，特別是在樣本數量很大時，求解的成本很高。
+
+記憶體消耗： N×N 的核矩陣需要大量的記憶體來儲存，對於非常大的資料集，可能會超出記憶體限制。
+
+因此，對於數萬或數十萬級別的樣本，標準的 SVC（尤其搭配 RBF 核心）可能會變得非常慢，甚至無法在合理的時間內完成訓練。
+
+LinearSVC：SVM 的線性版本
+LinearSVC 是 SVC 的一個變種，它專門用於線性可分的數據，並使用線性核（kernel='linear'）。
+
+原理： LinearSVC 旨在尋找一個線性分類器（一條直線或一個超平面）來分隔不同類別的資料點。它與標準 SVC 處理線性分類任務的方式有些不同，它使用了 liblinear 函式庫，該函式庫對線性分類問題進行了優化。
+
+優勢：
+
+速度快： 相較於 RBF 核心的 SVC，LinearSVC 在大型資料集上的訓練速度快得多。它的時間複雜度大約是 O(N×d)，其中 d 是特徵數量。
+
+記憶體效率高： 它不需要計算核矩陣，因此記憶體消耗也較小。
+
+缺點：
+
+僅適用於線性可分資料： 如果你的資料不是線性可分的（即無法用一條直線或超平面完美分隔），LinearSVC 的表現可能不如 RBF 核心的 SVC。
+
+適用場景：
+
+當資料集非常大，且你懷疑資料是線性可分或近似線性可分時。
+
+需要快速的分類器作為基準模型時。
+
+
+cross_val_score 的function 本身就包含了cv 的計算，只是使用前需要先建立cv的物件。
+
+random forest:
+https://ithelp.ithome.com.tw/articles/10359301
