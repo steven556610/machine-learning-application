@@ -35,8 +35,10 @@ method
     - similarity
         1. jaccard similarity
         2. cosine similarity
-        3. pearson 
+        3. pearson similarity
+
     - matrix factorization
         factor 數量的決定。 rating matrix(user x item) = user matrix (user x factor) x item matrix(factor x item)
         objective function
+        
     - KNN
