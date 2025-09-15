@@ -11,6 +11,7 @@ dataset: (https://www.kaggle.com/datasets/zeeshanyounas001/email-spam-detection/
 參考網頁:
 (https://www.tempmail.us.com/en/parsing/deciphering-emails-with-python-and-natural-language-processing)Fetching and Analyzing Mail from Gmail Using PythonNLP Libraries in Python
 (https://blog.csdn.net/yosemite1998/article/details/122306758)Natural Language Processing for Emails資料處理流程 (Data Processing Pipeline)
+https://www.geeksforgeeks.org/nlp/nlp-libraries-in-python/
 
 本專案的資料前置處理步驟，是確保模型能夠有效學習和預測的關鍵。
 以下是主要處理流程：
