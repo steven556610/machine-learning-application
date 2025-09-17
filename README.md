@@ -1,5 +1,21 @@
 # Description   
-for ml application and develop
+for ml application and develop.
+
+* 發展文字相關的應用
+目前執行到一半的 垃圾郵件分類
+文字應用可以用於蛋白質藥物開發
+
+* 新增推薦網路的應用
+已經完成 音樂的情緒分類應用
+音樂推薦
+舊藥新用的推薦系統。
+- matrix factoriztion method
+- 藥物網路的分析
+
+* 波型資料與圖片資料的應用與方法也會慢慢補上。
+圖片分類
+
+* 波型資料，音訊資料的語音轉成文字，聲樂分離．
 
 ## Git 提交規範
 
